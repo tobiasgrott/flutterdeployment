@@ -16,10 +16,10 @@ install:
 static_analysis:
   name: Static analysis
   script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
-unit_tests:
-  name: Unit tests
-  script: flutter test --coverage test/unit_test.dart
-  after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+#unit_tests:
+#  name: Unit tests
+#  script: flutter test --coverage test/unit_test.dart
+#  after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
 widget_tests:
   name: Widget tests
   script: flutter test --coverage test/widget_test.dart
@@ -79,9 +79,9 @@ jobs:
   include:
   - name: Static analysis
     script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
-  - name: Unit tests
-    script: flutter test --coverage test/unit_test.dart
-    after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+#  - name: Unit tests
+#    script: flutter test --coverage test/unit_test.dart
+#    after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
   - name: Widget tests
     script: flutter test --coverage test/widget_test.dart
     after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
