@@ -16,17 +16,10 @@ install:
 static_analysis:
   name: Static analysis
   script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
-#unit_tests:
-#  name: Unit tests
-#  script: flutter test --coverage test/unit_test.dart
-#  after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
 widget_tests:
   name: Widget tests
   script: flutter test --coverage test/widget_test.dart
   after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-#integration_tests:
-#  name: Integration tests
-#  script: flutter drive --target=test_driver/main.dart
 build:
   name: Build APK
   language: android
@@ -79,14 +72,9 @@ jobs:
   include:
   - name: Static analysis
     script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
-#  - name: Unit tests
-#    script: flutter test --coverage test/unit_test.dart
-#    after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
   - name: Widget tests
     script: flutter test --coverage test/widget_test.dart
     after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-#  - name: Integration tests
-#    script: flutter drive --target=test_driver/main.dart
   - name: Static analysis
     script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
     env: FLUTTER_CHANNEL=beta
