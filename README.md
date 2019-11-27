@@ -14,3 +14,13 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+### generate playstore key
+
+```
+keytool -genkey -v -keystore $PATH/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
+# Windows
+certutil -encode $PATH/key.jks tmp.b64 && findstr /v /c:- tmp.b64 && del tmp.b64
+# Linux
+base64 key.jks
+```
