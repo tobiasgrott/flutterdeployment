@@ -24,3 +24,5 @@ certutil -encode $PATH/key.jks tmp.b64 && findstr /v /c:- tmp.b64 && del tmp.b64
 # Linux
 base64 key.jks
 ```
+
+Add Output to Variable PLAY_STORE_UPLOAD_KEY in TravisCI
