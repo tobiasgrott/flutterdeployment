@@ -116,5 +116,5 @@ cache:
   directories:
   - "$HOME/.pub-cache"
 before_install:
-- openssl aes-256-cbc -K $encrypted_cd3517aab6a7_key -iv $encrypted_cd3517aab6a7_iv
+- openssl aes-256-cbc -K $encrypted_dfcdce790673_key -iv $encrypted_dfcdce790673_iv
   -in key.jks.enc -out key.jks -d
