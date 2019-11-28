@@ -78,8 +78,8 @@ jobs:
   - name: Widget tests
     script: flutter test --coverage test/widget_test.dart
     after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-  - name: Integration tests
-    script: flutter drive --target=test_driver/main.dart
+#  - name: Integration tests
+#    script: flutter drive --target=test_driver/main.dart
   - name: Static analysis
     script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
     env: FLUTTER_CHANNEL=beta
@@ -91,9 +91,9 @@ jobs:
     script: flutter test --coverage test/widget_test.dart
     after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
     env: FLUTTER_CHANNEL=beta
-  - name: Integration tests
-    script: flutter drive --target=test_driver/main.dart
-    env: FLUTTER_CHANNEL=beta
+#  - name: Integration tests
+#    script: flutter drive --target=test_driver/main.dart
+#    env: FLUTTER_CHANNEL=beta
   - stage: build
     name: Build APK
     language: android
