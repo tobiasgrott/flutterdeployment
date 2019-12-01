@@ -129,6 +129,7 @@ matrix:
           -in key.jks.enc -out key.jks -d
 
     - os: osx
+      osx_image: xcode11.2
       language: generic
       before_script:
         - brew update
