@@ -1,125 +1,142 @@
-language: generic
-dist: xenial
-addons:
-  apt:
-    packages:
-    - lib32stdc++6
-env:
-  global:
-  - FLUTTER_CHANNEL=stable
-install:
-- git clone https://github.com/flutter/flutter.git -b $FLUTTER_CHANNEL
-- export PATH="$PATH:`pwd`/flutter/bin/cache/dart-sdk/bin"
-- export PATH="$PATH:`pwd`/flutter/bin"
-- flutter doctor -v
-- flutter packages get
-static_analysis:
-  name: Static analysis
-  script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
-widget_tests:
-  name: Widget tests
-  script: flutter test --coverage test/widget_test.dart
-  after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-build:
-  name: Build APK
-  language: android
-  jdk: &1
-  - oraclejdk8
-  android: &2
-    components:
-    - tools
-    - tools
-    - platform-tools
-    - build-tools-28.0.3
-    - android-27
-    - android-28
-  before_script: &3
-  - export BUILD_NAME=$TRAVIS_TAG
-  - export BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
-  script: &4
-  - if [[ $TRAVIS_TAG == "" ]]; then flutter build apk; else flutter build apk --build-name
-    $BUILD_NAME --build-number $BUILD_NUMBER; fi
-  deploy: &5
-  - provider: releases
-    api_key: "$GITHUB_TOKEN"
-    file: build/app/outputs/apk/release/app-release.apk
-    skip_cleanup: true
-    name: "$TRAVIS_TAG"
-    on:
-      tags: true
-  after_deploy: &6
-  - git branch $TRAVIS_TAG
-  - git push https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_TAG
-google_play:
-  name: Google Play
-  install: &7
-  - bundle install --retry=3 --gemfile=android/Gemfile
-  - echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > $TRAVIS_BUILD_DIR/android/app/key.jks
-  before_script: &8
-  - chmod +x get_build_artifacts.sh
-  - export TRACK=$TRAVIS_BRANCH
-  - if [[ $TRAVIS_BRANCH == "prod" ]]; then export TRACK=production; fi
-  - mkdir -p "$TRAVIS_BUILD_DIR/build/app/outputs/apk/release" && cd "$_"
-  - "$TRAVIS_BUILD_DIR/get_build_artifacts.sh"
-  - cd $TRAVIS_BUILD_DIR/android
-  script: &9
-  - if [[ $TRAVIS_PULL_REQUEST_BRANCH == beta || $TRAVIS_PULL_REQUEST_BRANCH = alpha
-    || $TRAVIS_PULL_REQUEST_BRANCH = internal ]]; then bundle exec fastlane promote;
-    else bundle exec fastlane release; fi
-jobs:
-  allow_failures:
-  - env: FLUTTER_CHANNEL=beta
+matrix:
   include:
-  - name: Static analysis
-    script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
-  - name: Unit tests
-    script: flutter test --coverage test/unit_test.dart
-    after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-  - name: Widget tests
-    script: flutter test --coverage test/widget_test.dart
-    after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-#  - name: Integration tests
-#    script: flutter drive --target=test_driver/main.dart
-  - name: Static analysis
-    script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
-    env: FLUTTER_CHANNEL=beta
-  - name: Unit tests
-    script: flutter test --coverage test/unit_test.dart
-    after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-    env: FLUTTER_CHANNEL=beta
-  - name: Widget tests
-    script: flutter test --coverage test/widget_test.dart
-    after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
-    env: FLUTTER_CHANNEL=beta
-#  - name: Integration tests
-#    script: flutter drive --target=test_driver/main.dart
-#    env: FLUTTER_CHANNEL=beta
-  - stage: build
-    name: Build APK
-    language: android
-    jdk: *1
-    android: *2
-    before_script: *3
-    script: *4
-    deploy: *5
-    after_deploy: *6
-  - stage: deploy
-    name: Google Play
-    install: *7
-    before_script: *8
-    script: *9
-stages:
-- name: test
-  if: "(NOT branch =~ /^\\d*\\.\\d*\\.\\d*$/) OR (NOT branch IN (internal, alpha,
-    beta, prod))"
-- name: build
-  if: "(NOT branch =~ /^\\d*\\.\\d*\\.\\d*$/) OR (NOT branch IN (internal, alpha,
-    beta, prod))"
-- name: deploy
-  if: "(type = push) AND (branch IN (internal, alpha, beta, prod))"
-cache:
-  directories:
-  - "$HOME/.pub-cache"
-before_install:
-- openssl aes-256-cbc -K $encrypted_dfcdce790673_key -iv $encrypted_dfcdce790673_iv
-  -in key.jks.enc -out key.jks -d
+    - os: linux
+      language: generic
+      dist: xenial
+      addons:
+        apt:
+          packages:
+          - lib32stdc++6
+      env:
+        global:
+          - FLUTTER_CHANNEL=stable
+      install:
+        - git clone https://github.com/flutter/flutter.git -b $FLUTTER_CHANNEL
+        - export PATH="$PATH:`pwd`/flutter/bin/cache/dart-sdk/bin"
+        - export PATH="$PATH:`pwd`/flutter/bin"
+        - flutter doctor -v
+        - flutter packages get
+      static_analysis:
+        name: Static analysis
+        script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib  
+      widget_tests:
+        name: Widget tests
+        script: flutter test --coverage test/widget_test.dart
+        after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+      build:
+        name: Build APK
+        language: android
+        jdk: &1
+          - oraclejdk8
+        android: &2
+          components:
+            - tools
+            - platform-tools
+            - build-tools-28.0.3
+            - android-27
+            - android-28
+        before_script: &3
+          - export BUILD_NAME=$TRAVIS_TAG
+          - export BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+        script: &4
+          - if [[ $TRAVIS_TAG == "" ]]; then flutter build apk; else flutter build apk --build-name
+            $BUILD_NAME --build-number $BUILD_NUMBER; fi
+        deploy: &5
+          - provider: releases
+            api_key: "$GITHUB_TOKEN"
+            file: build/app/outputs/apk/release/app-release.apk
+            skip_cleanup: true
+            name: "$TRAVIS_TAG"
+            on:
+              tags: true
+        after_deploy: &6
+          - git branch $TRAVIS_TAG
+          - git push https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_TAG
+      google_play:
+       name: Google Play
+       install: &7
+         - bundle install --retry=3 --gemfile=android/Gemfile
+         - echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > $TRAVIS_BUILD_DIR/android/app/key.jks
+       before_script: &8
+         - chmod +x get_build_artifacts.sh
+         - export TRACK=$TRAVIS_BRANCH
+         - if [[ $TRAVIS_BRANCH == "prod" ]]; then export TRACK=production; fi
+         - mkdir -p "$TRAVIS_BUILD_DIR/build/app/outputs/apk/release" && cd "$_"
+         - "$TRAVIS_BUILD_DIR/get_build_artifacts.sh"
+         - cd $TRAVIS_BUILD_DIR/android
+       script: &9
+         - if [[ $TRAVIS_PULL_REQUEST_BRANCH == beta || $TRAVIS_PULL_REQUEST_BRANCH = alpha
+           || $TRAVIS_PULL_REQUEST_BRANCH = internal ]]; then bundle exec fastlane promote;
+           else bundle exec fastlane release; fi
+      jobs:
+       allow_failures:
+         - env: FLUTTER_CHANNEL=beta
+       include:
+         - name: Static analysis
+           script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
+         - name: Unit tests
+           script: flutter test --coverage test/unit_test.dart
+           after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+         - name: Widget tests
+           script: flutter test --coverage test/widget_test.dart
+           after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+         #  - name: Integration tests
+         #    script: flutter drive --target=test_driver/main.dart
+         - name: Static analysis
+           script: flutter analyze --no-current-package $TRAVIS_BUILD_DIR/lib
+           env: FLUTTER_CHANNEL=beta
+         - name: Unit tests
+           script: flutter test --coverage test/unit_test.dart
+           after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+           env: FLUTTER_CHANNEL=beta
+         - name: Widget tests
+           script: flutter test --coverage test/widget_test.dart
+           after_script: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+           env: FLUTTER_CHANNEL=beta
+         #  - name: Integration tests
+         #    script: flutter drive --target=test_driver/main.dart
+         #    env: FLUTTER_CHANNEL=beta
+         - stage: build
+           name: Build APK
+           language: android
+           jdk: *1
+           android: *2
+           before_script: *3
+           script: *4
+           deploy: *5
+           after_deploy: *6
+         - stage: deploy
+           name: Google Play
+           install: *7
+           before_script: *8
+           script: *9
+      stages:
+        - name: test
+          if:
+           "(NOT branch =~ /^\\d*\\.\\d*\\.\\d*$/) OR (NOT branch IN (internal, alpha,
+           beta, prod))"
+        - name: build
+          if:
+            "(NOT branch =~ /^\\d*\\.\\d*\\.\\d*$/) OR (NOT branch IN (internal, alpha,
+            beta, prod))"
+        - name: deploy
+          if: "(type = push) AND (branch IN (internal, alpha, beta, prod))"
+      cache:
+        directories:
+          - "$HOME/.pub-cache"
+      before_install:
+        - openssl aes-256-cbc -K $encrypted_dfcdce790673_key -iv $encrypted_dfcdce790673_iv
+          -in key.jks.enc -out key.jks -d
+
+    - os: osx
+      language: generic
+      osx_image: xcode8.3
+      before_script:
+        - pip install six
+        - brew update
+        - brew install --HEAD libimobiledevice
+        - brew install ideviceinstaller
+        - brew install ios-deploy
+        - git clone https://github.com/flutter/flutter.git
+      script:
+        - ./flutter/bin/flutter -v build ios --no-codesign 
