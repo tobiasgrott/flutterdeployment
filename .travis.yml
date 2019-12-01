@@ -8,8 +8,7 @@ matrix:
           packages:
           - lib32stdc++6
       env:
-        global:
-          - FLUTTER_CHANNEL=stable
+        - FLUTTER_CHANNEL=stable
       install:
         - echo "Flutter channel:" + $FLUTTER_CHANNEL
         - git clone https://github.com/flutter/flutter.git -b $FLUTTER_CHANNEL
