@@ -152,3 +152,11 @@ matrix:
         - cd ..
         - zip -r app.ipa Payload
         - popd
+      deploy:
+        - provider: releases
+          api_key: "$GITHUB_TOKEN"
+          file: build/ios/iphoneos/app.ipa
+          skip_cleanup: true
+          name: "$TRAVIS_TAG"
+          on:
+            tags: true
